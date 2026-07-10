@@ -79,7 +79,7 @@ async function crear(req, res, next) {
 // Solo la puede ver la ONG dueña de la campaña.
 async function listarDonaciones(req, res, next) {
   try {
-    const campana = await Campana.findByPk(req.params.id);
+    const campana = await Campana.findByPk
     if (!campana) return res.status(404).json({ message: 'Campaña no encontrada.' });
 
     if (req.user.role !== 'ong' || req.user.ongId !== campana.ongId) {
