@@ -1,21 +1,7 @@
-
-// auth.controller.js — Registro e inicio de sesión
-//
-// Estas dos funciones son usadas por:
-// RegisterScreen.jsx (frontend) -> POST /api/auth/register
-// LoginScreen.jsx    (frontend) -> POST /api/auth/login
-//
-// Ambas devuelven { token, user }: el "token" es el pase firmado
-// que el frontend debe guardar y mandar en el header
-// `Authorization: Bearer <token>` en cada request protegido.
-
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User, Ong } = require('../db/models');
 
-// Genera el token firmado con los datos mínimos necesarios para
-// identificar al usuario en las siguientes peticiones (verifyToken
-// los deja disponibles en req.user).
 function signToken(user) {
   return jwt.sign(
     { id: user.id, email: user.email, role: user.role, ongId: user.ongId },
@@ -24,10 +10,6 @@ function signToken(user) {
   );
 }
 
-// POST /api/auth/register — crea una cuenta nueva.
-// Si el rol es 'ong', además crea automáticamente la fila Ong
-// (con datos vacíos/placeholder) y la liga al usuario mediante ongId,
-// para que luego pueda editarla desde ProfileOngScreen.jsx.
 async function register(req, res, next) {
   try {
     const { fullName, email, password, role } = req.body;
@@ -45,8 +27,6 @@ async function register(req, res, next) {
       return res.status(409).json({ message: 'Ya existe una cuenta con ese correo.' });
     }
 
-    // Nunca se guarda la contraseña tal cual: se guarda su "hash"
-    // (una versión encriptada de un solo sentido, no reversible).
     const passwordHash = await bcrypt.hash(password, 10);
 
     let ongId = null;
@@ -67,7 +47,7 @@ async function register(req, res, next) {
       passwordHash,
       role,
       ongId,
-      creditos: 200, // mismo valor inicial que ya usaba RegisterScreen.jsx
+      creditos: 200,
     });
 
     const token = signToken(user);
@@ -77,7 +57,6 @@ async function register(req, res, next) {
   }
 }
 
-// POST /api/auth/login — verifica correo + contraseña y entrega el token.
 async function login(req, res, next) {
   try {
     const { email, password } = req.body;
@@ -91,8 +70,6 @@ async function login(req, res, next) {
       return res.status(401).json({ message: 'Usuario o contraseña incorrectos.' });
     }
 
-    // bcrypt.compare re-encripta la contraseña recibida y la compara
-    // contra el hash guardado, sin nunca "desencriptar" el que ya existe.
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) {
       return res.status(401).json({ message: 'Usuario o contraseña incorrectos.' });

@@ -1,19 +1,5 @@
-// ─────────────────────────────────────────────────────────────
-// postulaciones.controller.js — Postularse a un voluntariado
-//
-// Usado por: VoluntariadoDetailModal.jsx → POST /api/postulaciones
-// (reemplaza handlePostular() que antes vivía en App.jsx).
-// ─────────────────────────────────────────────────────────────
-
 const { sequelize, Voluntariado, Postulacion } = require('../db/models');
 
-// POST /api/postulaciones  body: { voluntariadoId }
-// Revisa que:
-//   1. Haya cupos libres (cuposOcupados < cupos).
-//   2. El usuario no se haya postulado ya a ese mismo voluntariado
-//      (la migración le puso un índice único a userId+voluntariadoId,
-//      así que aunque se nos pasara la validación, la base de datos
-//      rechazaría el duplicado).
 async function crear(req, res, next) {
   const t = await sequelize.transaction();
   try {

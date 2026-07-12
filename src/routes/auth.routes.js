@@ -1,6 +1,3 @@
-// Rutas de autenticación: define las "direcciones" (URLs) y qué
-// función del controller responde cada una. No tiene lógica propia,
-// solo conecta URL -> controller.
 const { Router } = require('express');
 const authController = require('../controllers/auth.controller');
 

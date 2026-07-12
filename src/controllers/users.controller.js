@@ -1,18 +1,3 @@
-// ─────────────────────────────────────────────────────────────
-// users.controller.js — Perfil del usuario logueado ("Mi Perfil")
-//
-// Usado por:
-//   • MyProfileScreen.jsx    → GET /api/me (ONGs seguidas, historial)
-//   • SeguimientoScreen.jsx  → GET /api/me (donaciones + horas)
-//   • ProfileOngScreen.jsx   → GET /api/me (datos de la ONG propia)
-//                            → PUT /api/me (guardar cambios de perfil)
-//
-// Antes esta información vivía hardcodeada solo para el usuario
-// demo "gatitos55"; ahora GET /api/me arma esta misma forma de
-// datos para CUALQUIER usuario, a partir de sus filas reales en
-// Donaciones, Postulaciones, HistorialVoluntariados y OngSeguidores.
-// ─────────────────────────────────────────────────────────────
-
 const {
   User,
   Ong,
@@ -23,25 +8,20 @@ const {
   Voluntariado,
 } = require('../db/models');
 
-// GET /api/me
 async function obtenerPerfil(req, res, next) {
   try {
     const user = await User.findByPk(req.user.id, {
       include: [
-        { model: Ong, as: 'ong' }, // solo tiene valor si role === 'ong'
+        { model: Ong, as: 'ong' },
         {
           model: Ong,
           as: 'ongsSeguidas',
           attributes: ['id', 'name', 'location', 'emoji', 'color'],
-          through: { attributes: [] }, // no incluir columnas de la tabla puente
+          through: { attributes: [] },
         },
         {
           model: Donacion,
           as: 'donaciones',
-          // Incluimos también imagen/meta/actual/desc porque
-          // MyProfileScreen.jsx usa la donación más reciente para
-          // mostrar la tarjeta "Campaña más reciente" con su barra
-          // de progreso — no solo el nombre.
           include: [
             {
               model: Campana,
@@ -70,15 +50,13 @@ async function obtenerPerfil(req, res, next) {
   }
 }
 
-// PUT /api/me — actualiza datos propios (no créditos, esos solo
-// cambian a través de donar). Usado por MyProfileScreen (foto de
-// perfil) y ProfileOngScreen (guardarPerfil, cuando el usuario es 'ong').
 async function actualizarPerfil(req, res, next) {
   try {
     const user = await User.findByPk(req.user.id);
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
 
-    const campos = ['fullName', 'username', 'photoUrl', 'biografia', 'creditos'];
+    // creditos no está en esta lista: solo puede cambiar por donar o recargar.
+    const campos = ['fullName', 'username', 'photoUrl', 'biografia'];
     campos.forEach((campo) => {
       if (req.body[campo] !== undefined) user[campo] = req.body[campo];
     });
@@ -90,4 +68,25 @@ async function actualizarPerfil(req, res, next) {
   }
 }
 
-module.exports = { obtenerPerfil, actualizarPerfil };
+async function agregarCreditos(req, res, next) {
+  try {
+    const { monto } = req.body;
+    const montoNumero = Number(monto);
+
+    if (!montoNumero || montoNumero <= 0) {
+      return res.status(400).json({ message: 'El monto a recargar debe ser mayor a 0.' });
+    }
+
+    const user = await User.findByPk(req.user.id);
+    if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
+
+    user.creditos = Number(user.creditos) + montoNumero;
+    await user.save();
+
+    return res.json(user.toPublicJSON());
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { obtenerPerfil, actualizarPerfil, agregarCreditos };

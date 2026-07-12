@@ -1,20 +1,5 @@
-// ─────────────────────────────────────────────────────────────
-// donaciones.controller.js — Registrar una donación
-//
-// Usado por: CampaignDetailModal.jsx → POST /api/donaciones
-// (reemplaza handleDonate() que antes vivía en App.jsx y
-// modificaba solo el estado local + localStorage).
-// ─────────────────────────────────────────────────────────────
-
 const { sequelize, User, Campana, Donacion } = require('../db/models');
 
-// POST /api/donaciones  body: { campanaId, monto }
-// Hace 3 cosas, como una sola operación (transacción):
-//   1. Descuenta los créditos al usuario logueado.
-//   2. Suma el monto a la campaña y le suma 1 donante.
-//   3. Deja un registro histórico en la tabla Donaciones.
-// Usamos una transacción para que, si algo falla a la mitad,
-// no se quede el dinero "descontado" sin haberse sumado a la campaña.
 async function crear(req, res, next) {
   const t = await sequelize.transaction();
   try {

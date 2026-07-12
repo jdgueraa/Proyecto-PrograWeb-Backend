@@ -1,17 +1,5 @@
-// ─────────────────────────────────────────────────────────────
-// ongs.controller.js — Listado, perfil y "seguir" ONGs
-//
-// Usado por:
-//   • SearchScreen.jsx   → GET /api/ongs         (buscar/filtrar)
-//   • ProfileScreen.jsx  → GET /api/ongs/:id      (ver perfil)
-//                        → POST /api/ongs/:id/follow (seguir/dejar de seguir)
-//   • ProfileOngScreen.jsx → PUT /api/ongs/:id    (editar perfil, solo el dueño)
-// ─────────────────────────────────────────────────────────────
-
 const { Ong, OngSeguidor } = require('../db/models');
 
-// GET /api/ongs — todas las ONGs (SearchScreen filtra por texto/categoría
-// en el propio frontend, igual que hacía antes con data.json).
 async function listar(req, res, next) {
   try {
     const ongs = await Ong.findAll({ order: [['id', 'ASC']] });
@@ -21,7 +9,6 @@ async function listar(req, res, next) {
   }
 }
 
-// GET /api/ongs/:id — perfil completo de una ONG (para ProfileScreen.jsx).
 async function obtener(req, res, next) {
   try {
     const ong = await Ong.findByPk(req.params.id);
@@ -32,9 +19,6 @@ async function obtener(req, res, next) {
   }
 }
 
-// PUT /api/ongs/:id — actualiza los datos de la ONG.
-// Solo lo puede hacer el usuario 'ong' dueño de esa organización
-// (comparamos req.user.ongId, que viene del token, contra el :id de la URL).
 async function actualizar(req, res, next) {
   try {
     const ong = await Ong.findByPk(req.params.id);
@@ -56,15 +40,11 @@ async function actualizar(req, res, next) {
   }
 }
 
-// POST /api/ongs/:id/follow — alterna entre seguir y dejar de seguir.
-// Reemplaza el toggleSeguir() que antes vivía en ProfileScreen.jsx
-// y solo actualizaba el estado local del usuario en memoria.
 async function alternarSeguir(req, res, next) {
   try {
     const ong = await Ong.findByPk(req.params.id);
     if (!ong) return res.status(404).json({ message: 'ONG no encontrada.' });
 
-    // Buscamos si ya existe la fila puente (userId, ongId) en OngSeguidores.
     const existente = await OngSeguidor.findOne({
       where: { userId: req.user.id, ongId: ong.id },
     });

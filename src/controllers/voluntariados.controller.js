@@ -1,19 +1,5 @@
-// ─────────────────────────────────────────────────────────────
-// voluntariados.controller.js — Oportunidades de voluntariado
-//
-// Usado por:
-//   • VoluntariadoScreen.jsx → GET /api/voluntariados
-//   • AdminScreen.jsx        → POST /api/voluntariados (crear, rol 'ong')
-//                            → GET /api/voluntariados/:id/postulaciones
-//
-// Igual que en campañas, badge/badgeClass ("Activo"/"Lleno") se
-// calculan al vuelo en Voluntariado.toPublicJSON() comparando
-// cuposOcupados vs cupos.
-// ─────────────────────────────────────────────────────────────
-
 const { Voluntariado, Ong, Postulacion, User } = require('../db/models');
 
-// GET /api/voluntariados
 async function listar(req, res, next) {
   try {
     const voluntariados = await Voluntariado.findAll({
@@ -26,7 +12,6 @@ async function listar(req, res, next) {
   }
 }
 
-// GET /api/voluntariados/:id
 async function obtener(req, res, next) {
   try {
     const voluntariado = await Voluntariado.findByPk(req.params.id, {
@@ -39,8 +24,6 @@ async function obtener(req, res, next) {
   }
 }
 
-// POST /api/voluntariados — crea un voluntariado para la ONG logueada.
-// Equivalente a handleCrearVoluntariado() en AdminScreen.jsx.
 async function crear(req, res, next) {
   try {
     const { name, desc, category, modalidad, cupos, duracion, fechaInicio, location } = req.body;
@@ -71,9 +54,6 @@ async function crear(req, res, next) {
   }
 }
 
-// GET /api/voluntariados/:id/postulaciones — lista de postulantes.
-// Reemplaza la lectura de localStorage('postulaciones') que hacía
-// AdminScreen.jsx. Solo la puede ver la ONG dueña del voluntariado.
 async function listarPostulaciones(req, res, next) {
   try {
     const voluntariado = await Voluntariado.findByPk(req.params.id);

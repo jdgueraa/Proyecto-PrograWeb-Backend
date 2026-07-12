@@ -6,5 +6,6 @@ const router = Router();
 
 router.get('/me', verifyToken, usersController.obtenerPerfil);
 router.put('/me', verifyToken, usersController.actualizarPerfil);
+router.post('/me/creditos', verifyToken, usersController.agregarCreditos);
 
 module.exports = router;

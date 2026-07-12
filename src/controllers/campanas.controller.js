@@ -1,20 +1,5 @@
-// ─────────────────────────────────────────────────────────────
-// campanas.controller.js — Campañas de donación
-//
-// Usado por:
-//   • DonationsScreen.jsx → GET /api/campanas (listar y filtrar en el frontend)
-//   • HomeScreen.jsx      → GET /api/campanas (campañas urgentes)
-//   • AdminScreen.jsx     → POST /api/campanas (crear, solo rol 'ong')
-//                         → GET /api/campanas/:id/donaciones (ver donantes)
-//
-// Nota: badge/badgeClass ("Activa"/"¡Lograda!") NO se guardan en la
-// base de datos — se calculan al vuelo en Campana.toPublicJSON()
-// comparando actual vs meta, así nunca quedan desactualizados.
-// ─────────────────────────────────────────────────────────────
-
 const { Campana, Ong, Donacion, User } = require('../db/models');
 
-// GET /api/campanas — todas las campañas con el nombre de su ONG incluido.
 async function listar(req, res, next) {
   try {
     const campanas = await Campana.findAll({
@@ -27,7 +12,6 @@ async function listar(req, res, next) {
   }
 }
 
-// GET /api/campanas/:id
 async function obtener(req, res, next) {
   try {
     const campana = await Campana.findByPk(req.params.id, {
@@ -40,9 +24,6 @@ async function obtener(req, res, next) {
   }
 }
 
-// POST /api/campanas — crea una campaña nueva para la ONG del usuario logueado.
-// Equivalente a handleCrearCampaña() en AdminScreen.jsx, pero ahora
-// guardado en la base de datos en vez de en el estado de React.
 async function crear(req, res, next) {
   try {
     const { name, desc, meta, category, location, fechaInicio, fechaFin, urgent } = req.body;
@@ -73,12 +54,6 @@ async function crear(req, res, next) {
   }
 }
 
-// GET /api/campanas/:id/donaciones — lista de quién donó a esta campaña.
-// Reemplaza la lectura de localStorage('donacionesLog') que hacía
-// AdminScreen.jsx para mostrar la lista de donantes por campaña.
-// Solo la puede ver la ONG dueña de la campaña.
-// solo es para que me acepte el commit actualizado -camilo 11-07-2026: 20:03
-//yo solo quiero actualizar 
 async function listarDonaciones(req, res, next) {
   try {
     const campana = await Campana.findByPk(req.params.id);

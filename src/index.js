@@ -3,8 +3,6 @@ const { sequelize } = require('./db/models');
 
 const PORT = process.env.PORT || 3000;
 
-//Conecta a la BD y prende el servidor 
-
 async function start() {
   try {
     await sequelize.authenticate();
