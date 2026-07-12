@@ -77,9 +77,11 @@ async function crear(req, res, next) {
 // Reemplaza la lectura de localStorage('donacionesLog') que hacía
 // AdminScreen.jsx para mostrar la lista de donantes por campaña.
 // Solo la puede ver la ONG dueña de la campaña.
+// solo es para que me acepte el commit actualizado -camilo 11-07-2026: 20:03
+//yo solo quiero actualizar 
 async function listarDonaciones(req, res, next) {
   try {
-    const campana = await Campana.findByPk
+    const campana = await Campana.findByPk(req.params.id);
     if (!campana) return res.status(404).json({ message: 'Campaña no encontrada.' });
 
     if (req.user.role !== 'ong' || req.user.ongId !== campana.ongId) {
