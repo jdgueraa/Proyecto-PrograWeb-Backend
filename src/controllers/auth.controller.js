@@ -1,14 +1,13 @@
-// ─────────────────────────────────────────────────────────────
+
 // auth.controller.js — Registro e inicio de sesión
 //
 // Estas dos funciones son usadas por:
-//   • RegisterScreen.jsx (frontend) → POST /api/auth/register
-//   • LoginScreen.jsx    (frontend) → POST /api/auth/login
+// RegisterScreen.jsx (frontend) -> POST /api/auth/register
+// LoginScreen.jsx    (frontend) -> POST /api/auth/login
 //
 // Ambas devuelven { token, user }: el "token" es el pase firmado
 // que el frontend debe guardar y mandar en el header
 // `Authorization: Bearer <token>` en cada request protegido.
-// ─────────────────────────────────────────────────────────────
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');

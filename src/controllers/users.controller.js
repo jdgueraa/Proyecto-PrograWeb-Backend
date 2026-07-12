@@ -38,7 +38,17 @@ async function obtenerPerfil(req, res, next) {
         {
           model: Donacion,
           as: 'donaciones',
-          include: [{ model: Campana, as: 'campana', attributes: ['id', 'name', 'ongId'] }],
+          // Incluimos también imagen/meta/actual/desc porque
+          // MyProfileScreen.jsx usa la donación más reciente para
+          // mostrar la tarjeta "Campaña más reciente" con su barra
+          // de progreso — no solo el nombre.
+          include: [
+            {
+              model: Campana,
+              as: 'campana',
+              attributes: ['id', 'name', 'ongId', 'imagen', 'meta', 'actual', 'desc'],
+            },
+          ],
         },
         {
           model: Postulacion,
@@ -68,7 +78,7 @@ async function actualizarPerfil(req, res, next) {
     const user = await User.findByPk(req.user.id);
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
 
-    const campos = ['fullName', 'username', 'photoUrl', 'biografia'];
+    const campos = ['fullName', 'username', 'photoUrl', 'biografia', 'creditos'];
     campos.forEach((campo) => {
       if (req.body[campo] !== undefined) user[campo] = req.body[campo];
     });
