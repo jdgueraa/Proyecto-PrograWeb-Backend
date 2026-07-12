@@ -78,7 +78,7 @@ async function actualizarPerfil(req, res, next) {
     const user = await User.findByPk(req.user.id);
     if (!user) return res.status(404).json({ message: 'Usuario no encontrado.' });
 
-    const campos = ['fullName', 'username', 'photoUrl', 'biografia'];
+    const campos = ['fullName', 'username', 'photoUrl', 'biografia', 'creditos'];
     campos.forEach((campo) => {
       if (req.body[campo] !== undefined) user[campo] = req.body[campo];
     });
